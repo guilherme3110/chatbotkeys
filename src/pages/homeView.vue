@@ -39,7 +39,7 @@
                           style="width:100%"
                           size="medium"
                           type="success"
-                          @click="abrirWhatsapp(bot.whatsapp)"
+                          @click="abrirWhatsapp(bot.whatsapp, bot.key)"
                         >
                           Abrir WhatsApp
                         </n-button>
@@ -118,11 +118,15 @@ async function fetchKeys() {
   }
 }
 
+
+
 function abrirWhatsapp(numero, key = "") {
   const numLimpo = numero.replace(/\D/g, "");
-  const url = `https://wa.me/${numLimpo}?text=${key}`;
+  const texto = encodeURIComponent(key || ""); // encode é importante!
+  const url = `https://wa.me/${numLimpo}?text=${texto}`;
   window.open(url, "_blank");
 }
+
 
 const router = useRouter()
 
