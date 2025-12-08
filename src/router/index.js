@@ -1,6 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import Home from '../pages/homeView.vue'
-import Feedback from '../pages/Feedback.vue'
+import Feedback from '../pages/feedBack.vue'
 import HomeView from '../pages/homeView.vue'
 import DashboardFeedback from '../pages/dashboardFeedback.vue'
 import LoginView from '@/pages/loginView.vue'
