@@ -85,7 +85,7 @@
 
 <script setup>
 import { ref, onMounted } from "vue";
-import { getBotKeys } from "@/supabase";
+import { getBotKeys } from "../supabase";
 import { useRouter } from "vue-router";
 
 
