@@ -16,3 +16,15 @@ export async function getBotKeys(search = "") {
   if (error) throw error;
   return data;
 }
+
+export async function insertBotKey(newKeyData) {
+  const { data, error } = await supabase
+    .from("bot_keys")
+    .insert(newKeyData)
+    .select(); 
+
+  if (error) throw error;
+  return data;
+}
+
+
