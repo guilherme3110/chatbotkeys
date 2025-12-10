@@ -212,7 +212,7 @@ async function fetchKeys() {
 
 function abrirWhatsapp(numero, key = "") {
   const numLimpo = numero.replace(/\D/g, "");
-  const texto = encodeURIComponent(key || ""); // encode é importante!
+  const texto = encodeURIComponent(key || ""); 
   const url = `https://wa.me/${numLimpo}?text=${texto}`;
   window.open(url, "_blank");
 }
@@ -271,7 +271,7 @@ const editBot = ref({
 });
 
 function abrirModalEdicao(bot) {
-  editBot.value = { ...bot }; // Preenche os dados
+  editBot.value = { ...bot }; 
   showEditModal.value = true;
 }
 
@@ -286,7 +286,7 @@ async function handleEditBot() {
     if (!response.ok) throw new Error("Erro ao editar bot");
 
     showEditModal.value = false;
-    fetchKeys(); // Recarrega lista
+    fetchKeys(); 
 
   } catch (err) {
     console.error("Erro ao atualizar bot:", err);
