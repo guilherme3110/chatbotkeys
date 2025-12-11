@@ -4,7 +4,7 @@
       <n-layout-content content-style="padding: 24px;">
         <n-grid y-gap="24" x-gap="24" :cols="24">
           <n-grid-item span="24">
-            <div class="flex justify-center gap-20 mb-4">
+            <div class="flex justify-end mb-4">
                 <n-button
                   style="display:flex; margin-left: 90%; top: 50px;"
                   size="medium"
@@ -21,7 +21,7 @@
               v-model:value="search"
               placeholder="Pesquisar bot por nome..."
               clearable
-              class="w-1/2"
+              class="w-full md:w-1/2"
               @input="fetchKeys"
             />
           
