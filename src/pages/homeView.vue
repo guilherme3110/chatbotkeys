@@ -3,11 +3,16 @@
     <n-layout>
       <n-layout-content content-style="padding: 24px;">
         <n-grid y-gap="24" x-gap="24" :cols="24">
-
-          <!-- HEADER -->
           <n-grid-item span="24">
-            <n-h2>Bot Keys</n-h2>
-
+            <n-h2>Bot Keys
+              <n-button 
+              style="width: 20%; margin-left: 10%"
+              size="medium"
+              type="info" secondary round 
+              @click="criarBot">
+            Adicionar novo bot
+          </n-button>
+            </n-h2>
             <n-input
               v-model:value="search"
               placeholder="Pesquisar bot por nome..."
@@ -15,216 +20,202 @@
               class="w-1/2"
               @input="fetchKeys"
             />
-
-            <n-button type="info" secondary round @click="criarBot">
-              Adicionar novo bot
-            </n-button>
+        
           </n-grid-item>
-
-          <!-- LISTA DE BOTS -->
           <n-grid-item span="24">
             <n-grid y-gap="24" x-gap="24" :cols="24">
-
               <n-grid-item
-                v-for="bot in botKeys"
-                :key="bot.id"
                 span="6"
+                v-for="bot in paginatedBots"
+                :key="bot.id"
                 v-if="!loading && botKeys.length > 0"
               >
                 <n-card size="medium" embedded>
                   <template #cover>
                     <n-image
-                      :src="bot.preview_url || fallbackImage"
+                      src="https://dummyimage.com/600x250/transparent/fff"
                       :alt="bot.nome"
                       object-fit="cover"
                       style="width: 100%; height: 250px"
-                      @error="onImgError"
+                      @error="onImgError($event)"
                     />
-
                     <div style="padding: 0px 24px 24px">
                       <n-h3 class="text-center mb-4">{{ bot.nome }}</n-h3>
-
-                      <p class="text-center mb-4">
-                        {{ bot.descricao || "Sem descrição disponível." }}
-                      </p>
-
-                      <div class="flex flex-col gap-4">
-
+                      <p class="text-center mb-4">Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s</p>
+                      <div class="flex justify-center gap-10 mb-4">
                         <n-button
                           v-if="bot.whatsapp"
+                          style="width:100%"
                           size="medium"
                           type="success"
                           @click="abrirWhatsapp(bot.whatsapp, bot.key)"
                         >
                           Abrir WhatsApp
                         </n-button>
-
+                       
+                       
+                      </div>
+                      <div class="flex justify-center gap-20 mb-4">
                         <n-button
+                          v-if="bot.whatsapp"
+                          style="width:100%"
                           size="medium"
                           type="success"
-                          @click="abrirFeedbackModal"
+                          @click="irParaFeedback"
                         >
-                          Enviar Feedback
+                         Enviar feedback
                         </n-button>
 
+                        <div class="flex justify-center gap-20 mb-4">
                         <n-button
+                          style="width:100%"
                           size="medium"
                           type="warning"
                           @click="abrirModalEdicao(bot)"
-                        >
-                          Editar Bot
+                          >
+                        Editar Bot
                         </n-button>
-
+                      </div>  
+                        
+                       
+                       
                       </div>
                     </div>
                   </template>
                 </n-card>
               </n-grid-item>
-
             </n-grid>
           </n-grid-item>
+
+          <div class="flex justify-center mt-10">
+            <n-pagination
+              v-model:page="page"
+              :page-size="pageSize"
+              :item-count="botKeys.length"
+              size="large"
+              show-size-picker="false"
+              show-quick-jumper/>
+          </div>
+          
         </n-grid>
       </n-layout-content>
     </n-layout>
 
- 
     <n-spin v-if="loading" size="large" description="Carregando bots..." />
-
 
     <n-alert v-if="error" type="error" closable>
       Erro ao buscar bots: {{ error }}
     </n-alert>
-
- 
+    
+    <router-view></router-view>
     <n-empty
       v-if="!loading && botKeys.length === 0 && !error"
       description="Nenhum bot encontrado."
     />
   </n-space>
 
-
   <n-modal v-model:show="showCreateModal" preset="dialog" title="Criar Novo Bot">
-    <n-form @submit.prevent="handleCreateBot" label-placement="top">
+  <n-form @submit.prevent="handleCreateBot" label-placement="top">
+    
+    <n-form-item label="Nome do Bot">
+      <n-input v-model:value="newBot.nome" required placeholder="Digite o nome..." />
+    </n-form-item>
 
-      <n-form-item label="Nome do Bot">
-        <n-input v-model:value="newBot.nome" required />
-      </n-form-item>
+    <n-form-item label="Imagem (URL)">
+      <n-input v-model:value="newBot.preview_url" placeholder="https://imagem.com/bot.png" />
+    </n-form-item>
+    
+    <n-form-item label="WhatsApp">
+      <n-input v-model:value="newBot.whatsapp" placeholder="5511999999999" />
+    </n-form-item>
 
-      <n-form-item label="Imagem (URL)">
-        <n-input v-model:value="newBot.preview_url" />
-      </n-form-item>
+    <n-form-item label="Chave do Bot">
+      <n-input v-model:value="newBot.key" required placeholder="Ex: abc123key" />
+    </n-form-item>
 
-      <n-form-item label="WhatsApp">
-        <n-input v-model:value="newBot.whatsapp" />
-      </n-form-item>
+    <n-form-item label="Descrição">
+      <n-input
+        v-model:value="newBot.descricao"
+        type="textarea"
+        rows="3"
+        placeholder="Descrição do bot..."
+      />
+    </n-form-item>
 
-      <n-form-item label="Chave do Bot">
-        <n-input v-model:value="newBot.key" required />
-      </n-form-item>
+    <n-space justify="end">
+      <n-button @click="showCreateModal = false">Cancelar</n-button>
+      <n-button type="primary" @click="handleCreateBot">Salvar</n-button>
+    </n-space>
 
-      <n-form-item label="Descrição">
-        <n-input
-          v-model:value="newBot.descricao"
-          type="textarea"
-          rows="3"
-        />
-      </n-form-item>
+  </n-form>
+</n-modal>
 
-      <n-space justify="end">
-        <n-button @click="showCreateModal = false">Cancelar</n-button>
-        <n-button type="primary" @click="handleCreateBot">Salvar</n-button>
-      </n-space>
-    </n-form>
-  </n-modal>
+<n-modal v-model:show="showEditModal" preset="dialog" title="Editar Bot">
+  <n-form @submit.prevent="handleEditBot" label-placement="top">
 
-  
-  <n-modal v-model:show="showEditModal" preset="dialog" title="Editar Bot">
-    <n-form @submit.prevent="handleEditBot" label-placement="top">
+    <n-form-item label="Nome do Bot">
+      <n-input v-model:value="editBot.nome" required />
+    </n-form-item>
 
-      <n-form-item label="Nome do Bot">
-        <n-input v-model:value="editBot.nome" required />
-      </n-form-item>
+    <n-form-item label="Imagem (URL)">
+      <n-input v-model:value="editBot.preview_url" />
+    </n-form-item>
 
-      <n-form-item label="Imagem (URL)">
-        <n-input v-model:value="editBot.preview_url" />
-      </n-form-item>
+    <n-form-item label="WhatsApp">
+      <n-input v-model:value="editBot.whatsapp" />
+    </n-form-item>
 
-      <n-form-item label="WhatsApp">
-        <n-input v-model:value="editBot.whatsapp" />
-      </n-form-item>
+    <n-form-item label="Chave do Bot">
+      <n-input v-model:value="editBot.key" required />
+    </n-form-item>
 
-      <n-form-item label="Chave do Bot">
-        <n-input v-model:value="editBot.key" required />
-      </n-form-item>
+    <n-form-item label="Descrição">
+      <n-input
+        v-model:value="editBot.descricao"
+        type="textarea"
+        rows="3"
+      />
+    </n-form-item>
 
-      <n-form-item label="Descrição">
-        <n-input
-          v-model:value="editBot.descricao"
-          type="textarea"
-          rows="3"
-        />
-      </n-form-item>
+    <n-space justify="end">
+      <n-button @click="showEditModal = false">Cancelar</n-button>
+      <n-button type="primary" @click="handleEditBot">Salvar Alterações</n-button>
+    </n-space>
 
-      <n-space justify="end">
-        <n-button @click="showEditModal = false">Cancelar</n-button>
-        <n-button type="primary" @click="handleEditBot">Salvar Alterações</n-button>
-      </n-space>
-    </n-form>
-  </n-modal>
+  </n-form>
+</n-modal>
 
- 
-  <n-modal v-model:show="feedbackModal" preset="dialog" title="Enviar Feedback">
-    <n-form @submit.prevent="sendFeedback" label-placement="top">
 
-      <n-form-item label="Nome">
-        <n-input v-model:value="form.nome" />
-      </n-form-item>
 
-      <n-form-item label="Email">
-        <n-input v-model:value="form.email" />
-      </n-form-item>
-
-      <n-form-item label="Avaliação (1 a 5)">
-        <n-input-number v-model:value="form.avaliacao" :min="1" :max="5" />
-      </n-form-item>
-
-      <n-form-item label="Mensagem">
-        <n-input
-          v-model:value="form.mensagem"
-          type="textarea"
-        />
-      </n-form-item>
-
-      <n-space justify="end">
-        <n-button @click="feedbackModal = false">Cancelar</n-button>
-        <n-button type="primary" @click="sendFeedback">Enviar</n-button>
-      </n-space>
-    </n-form>
-  </n-modal>
 </template>
 
 <script setup>
-import { ref, onMounted } from "vue";
-import { getBotKeys, insertBotKey, supabase } from "../supabase";
+import { ref, onMounted, computed } from "vue";
+import { getBotKeys } from "../supabase";
 import { useRouter } from "vue-router";
+import { NButton } from "naive-ui";
 
 
+const page =ref(1);
+const pageSize = 10;
 const botKeys = ref([]);
 const search = ref("");
 const loading = ref(false);
 const error = ref(null);
 const fallbackImage = "https://via.placeholder.com/300x200?text=Sem+Preview";
 
-
 function onImgError(e) {
   e.target.src = fallbackImage;
 }
 
+function formatDate(date) {
+  if (!date) return "";
+  return new Date(date).toLocaleString();
+}
 
 async function fetchKeys() {
   loading.value = true;
   error.value = null;
-
   try {
     const data = await getBotKeys(search.value.trim());
     botKeys.value = data;
@@ -236,12 +227,15 @@ async function fetchKeys() {
 }
 
 
+
 function abrirWhatsapp(numero, key = "") {
   const numLimpo = numero.replace(/\D/g, "");
-  const texto = encodeURIComponent(key);
-  window.open(`https://wa.me/${numLimpo}?text=${texto}`, "_blank");
+  const texto = encodeURIComponent(key || ""); 
+  const url = `https://wa.me/${numLimpo}?text=${texto}`;
+  window.open(url, "_blank");
 }
 
+import { insertBotKey } from "../supabase";
 
 const showCreateModal = ref(false);
 
@@ -250,7 +244,7 @@ const newBot = ref({
   preview_url: "",
   key: "",
   descricao: "",
-  whatsapp: ""
+  whatsapp: "+55 11 2626-4121"
 });
 
 function criarBot() {
@@ -259,7 +253,13 @@ function criarBot() {
 
 async function handleCreateBot() {
   try {
-    await insertBotKey(newBot.value);
+    await insertBotKey({
+      nome: newBot.value.nome,
+      preview_url: newBot.value.preview_url,
+      key: newBot.value.key,
+      descricao: newBot.value.descricao,
+      whatsapp: newBot.value.whatsapp
+    });
 
     showCreateModal.value = false;
 
@@ -271,12 +271,11 @@ async function handleCreateBot() {
       whatsapp: ""
     };
 
-    fetchKeys();
+    await fetchKeys();
   } catch (error) {
     console.error("Erro ao criar bot:", error.message);
   }
 }
-
 
 const showEditModal = ref(false);
 
@@ -290,60 +289,42 @@ const editBot = ref({
 });
 
 function abrirModalEdicao(bot) {
-  editBot.value = { ...bot };
+  editBot.value = { ...bot }; 
   showEditModal.value = true;
 }
 
 async function handleEditBot() {
   try {
-    const { error } = await supabase
-      .from("bots")
-      .update(editBot.value)
-      .eq("id", editBot.value.id);
+    const response = await fetch(`/api/bots/${editBot.value.id}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(editBot.value),
+    });
 
-    if (error) throw error;
+    if (!response.ok) throw new Error("Erro ao editar bot");
 
     showEditModal.value = false;
-    fetchKeys();
+    fetchKeys(); 
+
   } catch (err) {
     console.error("Erro ao atualizar bot:", err);
   }
 }
+const filteredBots = computed(() => {
+  if (!search.value) return botKeys.value;
+  return botKeys.value.filter(bot => bot.nome.toLowerCase().includes(search.value.toLowerCase()));
+})
 
-const feedbackModal = ref(false);
-const form = ref({
-  nome: "",
-  email: "",
-  avaliacao: null,
-  mensagem: ""
-});
+const paginatedBots = computed(() => {
+  const start = (page.value - 1) * pageSize;
+  const end = start + pageSize;
+  return botKeys.value.slice(start, end); 
+})
 
-function abrirFeedbackModal() {
-  feedbackModal.value = true;
-}
+const router = useRouter()
 
-async function sendFeedback() {
-  if (!form.value.nome || !form.value.email || !form.value.avaliacao || !form.value.mensagem) {
-    return;
-  }
-
-  const { error } = await supabase
-    .from("feedbacks")
-    .insert(form.value);
-
-  if (error) {
-    console.error("Erro ao enviar feedback:", error);
-    return;
-  }
-
-  feedbackModal.value = false;
-
-  form.value = {
-    nome: "",
-    email: "",
-    avaliacao: null,
-    mensagem: ""
-  };
+const irParaFeedback = () => {
+  router.push('/feedback')
 }
 
 onMounted(fetchKeys);
