@@ -125,10 +125,6 @@
       <n-input v-model:value="newBot.preview_url" placeholder="https://imagem.com/bot.png" />
     </n-form-item>
     
-    <n-form-item label="WhatsApp">
-      <n-input v-model:value="newBot.whatsapp" placeholder="5511999999999" />
-    </n-form-item>
-
     <n-form-item label="Chave do Bot">
       <n-input v-model:value="newBot.key" required placeholder="Ex: abc123key" />
     </n-form-item>
@@ -323,9 +319,13 @@ const paginatedBots = computed(() => {
 
 const router = useRouter()
 
-const irParaFeedback = () => {
-  router.push('/feedback')
+ const showFeedbackModal = ref(false);
+
+
+async function handleFeedback() {
+  showFeedbackModal.value = true;
 }
+ 
 
 onMounted(fetchKeys);
 </script>
