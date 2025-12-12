@@ -2,31 +2,30 @@
   <n-space vertical size="large" class="p-6">
     <n-layout>
       <n-layout-content content-style="padding: 24px;">
-        
-        <n-grid y-gap="24" x-gap="24" :cols="24">
-          <n-grid-item span="24">
+        <div>
+           <div class="container">
+            <n-h2>Chat Bot Keys</n-h2>
             <div class="flex justify-end mb-4">
                 <n-button
-                  style="display:flex; margin-left: 90%; top: 70px;"
-                  size="medium"
+                  style="width:100%"
+                  size="large"
                   type="warning"
                   @click="criarBot()"
                   >
-                  adicionar novo  Bot
+                  Adicionar novo  Bot
                 </n-button>
             </div>  
-            <n-h2>Bot Keys
-              
-            </n-h2>
-            <n-input
+           </div>
+           <n-input
               v-model:value="search"
               placeholder="Pesquisar bot por nome..."
               clearable
               class="w-full md:w-1/2"
               @input="fetchKeys"
             />
-          
-          </n-grid-item>
+        </div>
+        <div class="container-02">
+        <n-grid y-gap="24" x-gap="24" :cols="24">
           
           <n-grid-item span="24">
             <n-grid y-gap="24" x-gap="24" :cols="24">
@@ -98,6 +97,7 @@
           
           
         </n-grid>
+        </div>
        <div class="w-full justify-center mt-10">
             <n-pagination
               v-model:page="page"
@@ -166,10 +166,7 @@
       <n-input v-model:value="editBot.preview_url" />
     </n-form-item>
 
-    <n-form-item label="WhatsApp">
-      <n-input v-model:value="editBot.whatsapp" />
-    </n-form-item>
-
+   
     <n-form-item label="Chave do Bot">
       <n-input v-model:value="editBot.key" required />
     </n-form-item>
@@ -288,7 +285,7 @@ const editBot = ref({
   id: null,
   nome: "",
   preview_url: "",
-  whatsapp: "",
+  whatsapp: "+55 11 2626-4121",
   key: "",
   descricao: ""
 });
@@ -340,5 +337,11 @@ onMounted(fetchKeys);
 <style scoped>
 .shadow-md {
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+.container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0px 24px;
 }
 </style>
