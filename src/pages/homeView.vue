@@ -2,11 +2,12 @@
   <n-space vertical size="large" class="p-6">
     <n-layout>
       <n-layout-content content-style="padding: 24px;">
+        
         <n-grid y-gap="24" x-gap="24" :cols="24">
           <n-grid-item span="24">
             <div class="flex justify-end mb-4">
                 <n-button
-                  style="display:flex; margin-left: 90%; top: 50px;"
+                  style="display:flex; margin-left: 90%; top: 70px;"
                   size="medium"
                   type="warning"
                   @click="criarBot()"
@@ -26,6 +27,7 @@
             />
           
           </n-grid-item>
+          
           <n-grid-item span="24">
             <n-grid y-gap="24" x-gap="24" :cols="24">
               <n-grid-item
@@ -40,7 +42,7 @@
                       src="https://dummyimage.com/600x250/transparent/fff"
                       :alt="bot.nome"
                       object-fit="cover"
-                      style="width: 100%; height: 250px"
+                      style="width:1920px; height: 250px"
                       @error="onImgError($event)"
                     />
                     <div style="padding: 0px 24px 24px">
@@ -87,11 +89,16 @@
                     </div>
                   </template>
                 </n-card>
+                
               </n-grid-item>
+              
             </n-grid>
           </n-grid-item>
 
-          <div class="flex justify-center mt-10">
+          
+          
+        </n-grid>
+       <div class="w-full justify-center mt-10">
             <n-pagination
               v-model:page="page"
               :page-size="pageSize"
@@ -100,8 +107,6 @@
               show-size-picker="false"
               show-quick-jumper/>
           </div>
-          
-        </n-grid>
       </n-layout-content>
     </n-layout>
 
@@ -197,7 +202,7 @@ import { NButton } from "naive-ui";
 
 
 const page =ref(1);
-const pageSize = 10;
+const pageSize = 8;
 const botKeys = ref([]);
 const search = ref("");
 const loading = ref(false);
@@ -310,10 +315,8 @@ async function handleEditBot() {
     console.error("Erro ao atualizar bot:", err);
   }
 }
-const filteredBots = computed(() => {
-  if (!search.value) return botKeys.value;
-  return botKeys.value.filter(bot => bot.nome.toLowerCase().includes(search.value.toLowerCase()));
-})
+
+
 
 const paginatedBots = computed(() => {
   const start = (page.value - 1) * pageSize;
