@@ -14,7 +14,10 @@ export async function getBotKeys(search = "") {
 
   const { data, error } = await query;
   if (error) throw error;
-  return data;
+  return data.map(bot => ({
+    ...bot,
+    tags: bot.tag ? bot.tag.split(",") : []
+  }));
 }
 
 export async function insertBotKey(newKeyData) {
@@ -22,6 +25,17 @@ export async function insertBotKey(newKeyData) {
     .from("bot_keys")
     .insert(newKeyData)
     .select(); 
+
+  if (error) throw error;
+  return data;
+}
+
+export async function updateBotKey(id, updatedData) {
+  const { data, error } = await supabase
+    .from("bot_keys")
+    .update(updatedData)
+    .eq("id", id)
+    .select();
 
   if (error) throw error;
   return data;
